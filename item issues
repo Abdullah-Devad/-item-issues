@@ -1,0 +1,32 @@
+function main() {
+  // Replace 'SPREADSHEET_URL' with your Google Sheet URL.
+  var spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1FIq/';
+  var spreadsheet = SpreadsheetApp.openByUrl(spreadsheetUrl);
+  var sheet = spreadsheet.getActiveSheet();
+
+  // Get all shopping ad groups in the account.
+  var shoppingAdGroups = AdsApp.shoppingAdGroups().get();
+
+  // Write headers to the sheet.
+  sheet.appendRow(['Ad Group ID', 'Issue ID', 'Severity', 'Title', 'Description', 'Affected Items']);
+
+  // Loop through each ad group and get the product issues.
+  while (shoppingAdGroups.hasNext()) {
+    var adGroup = shoppingAdGroups.next();
+    var productIssues = adGroup.getProductIssues().getIssues();
+
+    // Write product issues to the sheet.
+    while (productIssues.hasNext()) {
+      var issue = productIssues.next();
+      var row = [
+        adGroup.getId(),
+        issue.getId(),
+        issue.getSeverity(),
+        issue.getTitle(),
+        issue.getDescription(),
+        issue.getAffectedItems().join(', ')
+      ];
+      sheet.appendRow(row);
+    }
+  }
+}
